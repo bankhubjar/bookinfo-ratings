@@ -4,6 +4,7 @@ Rating service has been developed on NodeJS
 
 ## How to run with Docker
 
+```bash
 # Build Docker Image for rating service
 docker build -t ratings .
 
