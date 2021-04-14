@@ -1,5 +1,5 @@
 ratings:
-  namespace: student108-bookinfo-uat
+  namespace: bank-bookinfo-uat
   image: ghcr.io/bankhubjar/bookinfo-ratings
   tag: uat
   replicas: 1

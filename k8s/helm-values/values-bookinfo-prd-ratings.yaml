@@ -1,5 +1,5 @@
 ratings:
-  namespace: student108-bookinfo-prd
+  namespace: bank-bookinfo-prd
   image: ghcr.io/bankhubjar/bookinfo-ratings
   tag: prd
   replicas: 1

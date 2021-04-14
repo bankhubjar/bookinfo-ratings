@@ -1,5 +1,5 @@
 ratings:
-  namespace: student108-bookinfo-dev
+  namespace: bank-bookinfo-dev
   image: ghcr.io/bankhubjar/bookinfo-ratings
   tag: dev
   replicas: 1
