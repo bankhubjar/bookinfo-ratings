@@ -7,12 +7,12 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
     kubernetes.io/ingress.class: azure/application-gateway
     appgw.ingress.kubernetes.io/health-probe-path: "/health"
-    appgw.ingress.kubernetes.io/backend-path-prefix: "/bank-ratings/"
+    appgw.ingress.kubernetes.io/backend-path-prefix: "/bank/ratings/"
 spec:
   rules:
     - http:
        paths:
-       - path: /bank-ratings(/|$)(.*)
+       - path: /bank/ratings(/|$)(.*)
          pathType: Prefix
          backend:
           service:
