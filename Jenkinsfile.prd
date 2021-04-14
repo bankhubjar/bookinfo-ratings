@@ -58,7 +58,7 @@ spec:
       steps {
         container('helm') {
           script {
-            withKubeConfig([credentialsId: 'kubeconfigfile']) {
+            withKubeConfig([credentialsId: 'kubeconfig']) {
               // Helm upgrade with set production tag
               sh "helm upgrade -i -f k8s/helm-values/values-bookinfo-prd-ratings.yaml \
                 --set extraEnv.COMMIT_ID=${scmVars.GIT_COMMIT} \

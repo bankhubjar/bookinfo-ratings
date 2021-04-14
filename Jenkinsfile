@@ -77,7 +77,7 @@ spec:
         container('helm') {
           script {
             // Use kubeconfig from Jenkins Credential
-            withKubeConfig([credentialsId: 'kubeconfigfile']) {
+            withKubeConfig([credentialsId: 'kubeconfig']) {
                 // Run Helm upgrade
                 sh "helm upgrade -i -f k8s/helm-values/values-bookinfo-${ENV_NAME}-ratings.yaml --wait \
                 --set extraEnv.COMMIT_ID=${scmVars.GIT_COMMIT} \
