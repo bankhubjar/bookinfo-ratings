@@ -58,9 +58,7 @@ spec:
       steps {
         container('helm') {
           script {
-            withKubeConfig([credentialsId: 'gke-kubeconfig']) {
-                
-            withCredentials([file(credentialsId: 'gke-sa-key-json', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]){
+            withKubeConfig([credentialsId: 'kubeconfigfile']) {
               // Helm upgrade with set production tag
               sh "helm upgrade -i -f k8s/helm-values/values-bookinfo-prd-ratings.yaml \
                 --set extraEnv.COMMIT_ID=${scmVars.GIT_COMMIT} \
