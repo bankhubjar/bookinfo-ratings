@@ -5,14 +5,13 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /$2
-    kubernetes.io/ingress.class: azure/application-gateway
     appgw.ingress.kubernetes.io/health-probe-path: "/health"
-    appgw.ingress.kubernetes.io/backend-path-prefix: "/bank/ratings/"
+    appgw.ingress.kubernetes.io/backend-path-prefix: "/bankratings/"
 spec:
   rules:
     - http:
        paths:
-       - path: /bank/ratings(/|$)(.*)
+       - path: /bankratings(/|$)(.*)
          pathType: Prefix
          backend:
           service:
