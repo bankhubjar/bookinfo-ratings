@@ -1,10 +1,10 @@
 ratings:
-  namespace: student108-bookinfo-dev
+  namespace: bank-bookinfo-dev
   image: ghcr.io/bankhubjar/bookinfo-ratings
   tag: dev
   replicas: 1
   imagePullSecrets: registry-bookinfo
-  port: 8080
+  port: 8081
   healthCheckPath: "/health"
   mongodbPasswordExistingSecret: bookinfo-dev-ratings-mongodb-secret
 ingress:
