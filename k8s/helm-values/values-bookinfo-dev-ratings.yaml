@@ -11,8 +11,10 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /$2
-  host: bookinfo.dev.opsta.net
-  path: "/student108/ratings(/|$)(.*)"
+  # host: bookinfo.dev.opsta.net
+  # path: "/student108/ratings(/|$)(.*)"
+  host: bookinfo.dev.hellodolphin.in.th
+  path: "/bank(/|$)(.*)"
   serviceType: ClusterIP
 extraEnv:
   SERVICE_VERSION: v2
