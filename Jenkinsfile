@@ -77,14 +77,11 @@ spec:
         container('helm') {
           script {
             // Use kubeconfig from Jenkins Credential
-            withKubeConfig([credentialsId: 'gke-kubeconfig']) {
-                
-            withCredentials([file(credentialsId: 'gke-sa-key-json', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]){  
-              // Run Helm upgrade
-              sh "helm upgrade -i -f k8s/helm-values/values-bookinfo-${ENV_NAME}-ratings.yaml --wait \
+            withKubeConfig([credentialsId: 'kubeconfigfile']) {
+                // Run Helm upgrade
+                sh "helm upgrade -i -f k8s/helm-values/values-bookinfo-${ENV_NAME}-ratings.yaml --wait \
                 --set extraEnv.COMMIT_ID=${scmVars.GIT_COMMIT} \
                 --namespace bank-bookinfo-${ENV_NAME} bookinfo-${ENV_NAME}-ratings k8s/helm"
-                }
             } // End withKubeConfig
           } // End script
         } // End container
