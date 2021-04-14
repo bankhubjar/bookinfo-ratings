@@ -7,11 +7,12 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   rules:
-    - http:
-       paths:
-       - path: /bankratings(/|$)(.*)
-         pathType: Prefix
-         backend:
-          serviceName: {{ .Release.Name }}
-          servicePort: {{ .Values.ratings.port }}
+    - host: hellodolphin.in.th
+      http:
+        paths:
+        - path: /bank(/|$)(.*)
+          pathType: Prefix
+          backend:
+            serviceName: {{ .Release.Name }}
+            servicePort: {{ .Values.ratings.port }}
 
