@@ -66,7 +66,7 @@ spec:
 
     // ***** Stage Sonarqube *****
     stage('Sonarqube Scanner') {
-        staps {
+        steps {
             container('java-node'){
                 script {
                     // Authentiocation with https://sonarqube.hellodolphin.in.th
