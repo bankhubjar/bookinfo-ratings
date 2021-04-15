@@ -34,6 +34,13 @@ spec:
     command:
     - cat
     tty: true   
+    volumeMounts:
+    - mountPath: /home/jenkins/dependency-chack-data
+      name: dependency-chack-data
+  volumes:
+  - name: dependency-chack-data
+    hostPath:
+      path: /tmp/dependency-chack-data
 """
     } // End kubernetes
   } // End agent
@@ -78,7 +85,7 @@ spec:
                         -D sonar.projectVersion=${BRANCH_NAME}-${BUILD_NUMBER} \
                         -D sonar.sources=./src
                         '''
-                    }//End withSonarQubeEnv
+                    } // End withSonarQubeEnv
 
                     // Run Quality Gate
                     timeout(time: 1, unit: 'MINUTES') { 
@@ -87,6 +94,32 @@ spec:
                             error "Pipeline aborted due to quality gate failure: ${qg.status}"
                         }
                     } // End Timeout
+                } // End script
+            } // End container
+        } // End steps
+    } // End stage
+
+    // ***** Stage OWASP *****
+    stage('OWASP Dependency Check') {
+        steps {
+            container('java-node') {
+                script {
+                    // Install application dependency
+                    sh '''cd src/ && npm install --package-lock && cd ../'''
+
+                    // Start OWASP Dependency Check
+                    dependencyCheck(
+                        additionalArguments: "--data /home/jenkins/dependency-check-data --out dependency-chack-report.xml",
+                        odcInstallation: "dependency-chack"
+                    )
+
+                    // Publish report to Jenkins
+                    dependencyCheckPublisher(
+                        pattern: 'dependency-chack-report.xml'
+                    )
+
+                    // Remove applocation dependency
+                    sh'''rm -rf src/node_modules src/package-lock.json'''
                 } // End script
             } // End container
         } // End steps
