@@ -14,11 +14,6 @@ apiVersion: v1
 kind: Pod
 spec:
   containers:
-  - name: helm
-    image: lachlanevenson/k8s-helm:v3.0.2
-    command:
-    - cat
-    tty: true
   - name: docker
     image: docker:19.03.5-dind
     command:
@@ -29,11 +24,24 @@ spec:
     tty: true
     securityContext:
       privileged: true
+  - name: helm
+    image: lachlanevenson/k8s-helm:v3.0.2
+    command:
+    - cat
+    tty: true
+  - name: java-node
+    image: timbru31/java-node:11-alpine-jre-14
+    command:
+    - cat
+    tty: true   
 """
     } // End kubernetes
   } // End agent
     environment {
     ENV_NAME = "${BRANCH_NAME == "master" ? "uat" : "${BRANCH_NAME}"}"
+    SCANNER_HOME = tool 'sonarqube-scanner'
+    PROJECT_KEY = "bank-bookinfo-ratings"
+    PROJECT_NAME = "bank-bookinfo-ratings"
   }
 
   // Start Pipeline
@@ -54,6 +62,34 @@ spec:
           } // End script
         } // End container
       } // End steps
+    } // End stage
+
+    // ***** Stage Sonarqube *****
+    stage('Sonarqube Scanner') {
+        steps {
+            container('java-node'){
+                script {
+                    // Authentiocation with https://sonarqube.hellodolphin.in.th
+                    withSonarQubeEnv('sonarqube-scanner') {
+                        // Run Sonar Scanner
+                        sh '''${SCANNER_HOME}/bin/sonar-scanner \
+                        -D sonar.projectKey=${PROJECT_KEY} \
+                        -D sonar.projectName=${PROJECT_NAME} \
+                        -D sonar.projectVersion=${BRANCH_NAME}-${BUILD_NUMBER} \
+                        -D sonar.sources=./src
+                        '''
+                    }//End withSonarQubeEnv
+
+                    // Run Quality Gate
+                    timeout(time: 1, unit: 'MINUTES') { 
+                        def qg = waitForQualityGate()
+                        if (qg.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                        }
+                    } // End Timeout
+                } // End script
+            } // End container
+        } // End steps
     } // End stage
 
     // ***** Stage Build *****
