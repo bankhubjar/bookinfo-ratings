@@ -35,12 +35,12 @@ spec:
     - cat
     tty: true   
     volumeMounts:
-    - mountPath: /home/jenkins/dependency-chack-data
-      name: dependency-chack-data
+    - mountPath: /home/jenkins/dependency-check-data
+      name: dependency-check-data
   volumes:
-  - name: dependency-chack-data
+  - name: dependency-check-data
     hostPath:
-      path: /tmp/dependency-chack-data
+      path: /tmp/dependency-check-data
 """
     } // End kubernetes
   } // End agent
@@ -109,13 +109,13 @@ spec:
 
                     // Start OWASP Dependency Check
                     dependencyCheck(
-                        additionalArguments: "--data /home/jenkins/dependency-check-data --out dependency-chack-report.xml",
-                        odcInstallation: "dependency-chack"
+                        additionalArguments: "--data /home/jenkins/dependency-check-data --out dependency-check-report.xml",
+                        odcInstallation: "dependency-check"
                     )
 
                     // Publish report to Jenkins
                     dependencyCheckPublisher(
-                        pattern: 'dependency-chack-report.xml'
+                        pattern: 'dependency-check-report.xml'
                     )
 
                     // Remove applocation dependency
