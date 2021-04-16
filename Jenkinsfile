@@ -146,7 +146,7 @@ spec:
             container('jnlp') {
                 script {
                     // dend Docker Image to Anchore Analyzer
-                    writeFile file: 'anchore_images' , text: "ghcr.io/bankhubjar/bookinfo-ratings"
+                    writeFile file: 'anchore_images' , text: "ghcr.io/bankhubjar/bookinfo-ratings:${ENV_NAME}"
                     anchore name: 'anchore_images' , bailOnFail: false
                 } // End script
             } // End container
