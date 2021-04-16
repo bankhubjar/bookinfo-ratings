@@ -159,8 +159,8 @@ dispatcher.onGet(/^\/ratings\/[0-9]*/, function (req, res) {
               res.writeHead(500, {'Content-type': 'application/json'})
               res.end(JSON.stringify({error: 'could not load ratings from database'}))
             } else {
-              firstRating = data[0].rating
-              secondRating = data[1].rating
+              firstRating = data[0].rating;
+              secondRating = data[1].rating;
               var result = {
                 id: productId,
                 ratings: {

@@ -19,6 +19,5 @@ ingress:
 extraEnv:
   SERVICE_VERSION: v2
   MONGO_DB_URL: mongodb://bookinfo-uat-ratings-mongodb:27017/?authSource=ratings
-  MONGO_DB_NAME: ratings-uat
-  MONGO_DB_USERNAME: ratings-uat
+  MONGO_DB_NAME: ratings
   COMMIT_Id: CHANGEME
