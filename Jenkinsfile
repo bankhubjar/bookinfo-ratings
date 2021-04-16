@@ -104,7 +104,7 @@ spec:
         steps {
             container('java-node'){
                 script {
-                    // Authentiocation with https://sonarqube.hellodolphin.in.th
+                    // Authentiocation with http://sonarqube.hellodolphin.in.th
                     withSonarQubeEnv('sonarqube-scanner') {
                         // Run Sonar Scanner
                         sh '''${SCANNER_HOME}/bin/sonar-scanner \
@@ -173,9 +173,11 @@ spec:
         steps {
             container('jnlp') {
                 script {
+                    docker.withRegistry('https://ghcr.io', 'Github_Registry') {
                     // dend Docker Image to Anchore Analyzer
                     writeFile file: 'anchore_images' , text: "ghcr.io/bankhubjar/bookinfo-ratings:${ENV_NAME}"
                     anchore name: 'anchore_images' , bailOnFail: false
+                    }
                 } // End script
             } // End container
         } // End steps
