@@ -63,7 +63,7 @@ spec:
               sh "helm upgrade -i -f k8s/helm-values/values-bookinfo-prd-ratings.yaml \
                 --set extraEnv.COMMIT_ID=${scmVars.GIT_COMMIT} \
                 --set ratings.tag=${params.TAG} \
-                --namespace bank-bookinfo-prd bank-ratings-prd k8s/helm"
+                --namespace bank-bookinfo-prd bookinfo-prd-ratings k8s/helm"
             }
           }
         }
