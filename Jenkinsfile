@@ -29,11 +29,23 @@ spec:
     command:
     - cat
     tty: true
+  - name: skan
+    image: alcide/skan:v0.9.0-debug
+    command:
+    - cat
+    tty: true
   - name: java-node
     image: timbru31/java-node:11-alpine-jre-14
     command:
     - cat
     tty: true   
+    volumeMounts:
+    - mountPath: /home/jenkins/dependency-check-data
+      name: dependency-check-data
+  volumes:
+  - name: dependency-check-data
+    hostPath:
+      path: /tmp/dependency-check-data
 """
     } // End kubernetes
   } // End agent
@@ -64,12 +76,35 @@ spec:
       } // End steps
     } // End stage
 
+    stage('sKan') {
+        steps {
+            container('helm') {
+                script {
+                    // Generate k8s-manifest-deploy.yaml for scanning
+                    sh "helm template -f k8s/helm-values/values-bookinfo-${ENV_NAME}-ratings.yaml \
+                        --set extraEnv.COMMIT_ID=${scmVars.GIT_COMMIT} \
+                        --namespace bank-bookinfo-${ENV_NAME} bookinfo-${ENV_NAME}-ratings k8s/helm \
+                        > k8s-manifest-deploy.yaml"
+                }
+            }
+            container('skan') {
+                script {
+                    // Scanning with sKan
+                    sh "/skan manifest -f k8s-manifest-deploy.yaml"
+                    // Keep report as artifacts
+                    archiveArtifacts artifacts: 'skan-result.html'
+                    sh "rm k8s-manifest-deploy.yaml"
+                }
+            }
+        }
+    }
+
     // ***** Stage Sonarqube *****
     stage('Sonarqube Scanner') {
         steps {
             container('java-node'){
                 script {
-                    // Authentiocation with https://sonarqube.hellodolphin.in.th
+                    // Authentiocation with http://sonarqube.hellodolphin.in.th
                     withSonarQubeEnv('sonarqube-scanner') {
                         // Run Sonar Scanner
                         sh '''${SCANNER_HOME}/bin/sonar-scanner \
@@ -78,15 +113,41 @@ spec:
                         -D sonar.projectVersion=${BRANCH_NAME}-${BUILD_NUMBER} \
                         -D sonar.sources=./src
                         '''
-                    }//End withSonarQubeEnv
+                    } // End withSonarQubeEnv
 
                     // Run Quality Gate
-                    timeout(time: 1, unit: 'MINUTES') { 
+                    timeout(time: 3, unit: 'MINUTES') { 
                         def qg = waitForQualityGate()
                         if (qg.status != 'OK') {
                             error "Pipeline aborted due to quality gate failure: ${qg.status}"
                         }
                     } // End Timeout
+                } // End script
+            } // End container
+        } // End steps
+    } // End stage
+
+    // ***** Stage OWASP *****
+    stage('OWASP Dependency Check') {
+        steps {
+            container('java-node') {
+                script {
+                    // Install application dependency
+                    sh '''cd src/ && npm install --package-lock && cd ../'''
+
+                    // Start OWASP Dependency Check
+                    dependencyCheck(
+                        additionalArguments: "--data /home/jenkins/dependency-check-data --out dependency-check-report.xml",
+                        odcInstallation: "dependency-check"
+                    )
+
+                    // Publish report to Jenkins
+                    dependencyCheckPublisher(
+                        pattern: 'dependency-check-report.xml'
+                    )
+
+                    // Remove applocation dependency
+                    sh'''rm -rf src/node_modules src/package-lock.json'''
                 } // End script
             } // End container
         } // End steps
@@ -107,6 +168,19 @@ spec:
       } // End steps
     } // End stage
     
+    // ***** Stage Anchore *****
+    stage('Anchore Engine') {
+        steps {
+            container('jnlp') {
+                script {
+                    // dend Docker Image to Anchore Analyzer
+                    writeFile file: 'anchore_images' , text: "ghcr.io/bankhubjar/bookinfo-ratings:${ENV_NAME}"
+                    anchore name: 'anchore_images' , bailOnFail: false
+                } // End script
+            } // End container
+        } // End steps
+    } // End stage
+
     stage('Deploy ratings with Helm Chart') {
       steps {
         // Run on Helm container
