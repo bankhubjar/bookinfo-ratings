@@ -149,6 +149,7 @@ dispatcher.onGet(/^\/ratings\/[0-9]*/, function (req, res) {
       })
     } else {
       MongoClient.connect(url, options, function (err, db) {
+        var db = client.db(process.env.MONGO_DB_NAME)
         if (err) {
           res.writeHead(500, {'Content-type': 'application/json'})
           res.end(JSON.stringify({error: 'could not connect to ratings database'}))
@@ -171,7 +172,7 @@ dispatcher.onGet(/^\/ratings\/[0-9]*/, function (req, res) {
               res.end(JSON.stringify(result))
             }
             // close DB once done:
-            db.close()
+            client.close()
           })
         }
       })
