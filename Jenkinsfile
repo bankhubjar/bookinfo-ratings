@@ -140,6 +140,19 @@ spec:
       } // End steps
     } // End stage
     
+    // ***** Stage Anchore *****
+    stage('Anchore Engine') {
+        steps {
+            container('jnlp') {
+                script {
+                    // dend Docker Image to Anchore Analyzer
+                    writeFile file: 'anchore_images' , text: "ghcr.io/bankhubjar/bookinfo-ratings"
+                    anchore name: 'anchore_images' , bailOnFail: false
+                } // End script
+            } // End container
+        } // End steps
+    } // End stage
+
     stage('Deploy ratings with Helm Chart') {
       steps {
         // Run on Helm container
