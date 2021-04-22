@@ -14,7 +14,7 @@ ingress:
   # host: bookinfo.dev.opsta.net
   # path: "/student108/ratings(/|$)(.*)"
   host: bookinfo.hellodolphin.in.th
-  path: "/bank(/|$)(.*)"
+  path: "/bank/ratings(/|$)(.*)"
   serviceType: ClusterIP
 extraEnv:
   SERVICE_VERSION: v2
